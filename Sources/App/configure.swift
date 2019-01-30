@@ -17,9 +17,13 @@ public func configure(
      middlewares.use(ErrorMiddleware.self)
      services.register(middlewares)*/
     
+    services.register { _ in
+        NIOServerConfig.init(hostname: "0.0.0.0", port: 8080, backlog: 0, workerCount: 0, maxBodySize: 5000, reuseAddress: true, tcpNoDelay: true)
+    }
+    
     var databases = DatabasesConfig()
     //let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "giulio-skylabs", database: "locationstest")
-    let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "root", database: "locationstest")
+    let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "root", database: "locationstest", password: "cgg41355756nzg")
     databases.add(database: PostgreSQLDatabase(config: config), as: .psql)
     services.register(databases)
     

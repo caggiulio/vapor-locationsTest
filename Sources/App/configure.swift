@@ -18,7 +18,7 @@ public func configure(
      services.register(middlewares)*/
     
     services.register { _ in
-        NIOServerConfig.init(hostname: "0.0.0.0", port: 8080, backlog: 1, workerCount: 1, maxBodySize: 5000, reuseAddress: true, tcpNoDelay: true)
+        NIOServerConfig.init(hostname: "0.0.0.0", port: 80, backlog: 1, workerCount: 1, maxBodySize: 5000, reuseAddress: true, tcpNoDelay: true)
     }
     
     var databases = DatabasesConfig()

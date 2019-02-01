@@ -23,7 +23,7 @@ public func configure(
     
     var databases = DatabasesConfig()
     //let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "giulio-skylabs", database: "locationstest")
-    let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "root", database: "locationstest", password: "cgg41355756nzg")
+    let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "giulio", database: "locationstest", password: "cgg41355756nzg")
     databases.add(database: PostgreSQLDatabase(config: config), as: .psql)
     services.register(databases)
     

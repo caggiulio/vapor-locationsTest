@@ -20,6 +20,7 @@ final class LocationController: RouteCollection {
     }
     
     func create(_ request: Request, _ location: Location)throws -> Future<Location> {
+        location.timestamp = location.timestamp.stringToDate(timestamp: location.timestamp)
         return location.save(on: request)
     }
     

@@ -26,7 +26,11 @@ final class LocationController: RouteCollection {
     }
     
     func index(_ request: Request)throws -> Future<[Location]> {
-        return Location.query(on: request).all()
+        if let tripIDReq = try? request.query.get(String.self, at: "tripID") {
+            return Location.query(on: request).filter(\.tripID == tripIDReq).all()
+        } else {
+            return Location.query(on: request).all()
+        }
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {

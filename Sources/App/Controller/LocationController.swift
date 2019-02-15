@@ -15,7 +15,7 @@ final class LocationController: RouteCollection {
         locations.post(Location.self, use: create)
         locations.get(use: index)
         locations.post([Location].self, use: postArray)
-        //locations.get(User.parameter, use: show)
+        locations.get(Location.parameter, use: show)
         //locations.patch(UserContent.self, at: User.parameter, use: update)
         //locations.delete(User.parameter, use: delete)
     }
@@ -31,6 +31,11 @@ final class LocationController: RouteCollection {
         } else {
             return Location.query(on: request).all()
         }
+    }
+    
+    func show(_ request: Request)throws -> Future<[Location]> {
+        let tripIDReq = request.parameters.values[0].value
+        return Location.query(on: request).filter(\.tripID == tripIDReq).all()
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {

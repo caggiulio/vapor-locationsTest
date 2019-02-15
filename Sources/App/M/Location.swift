@@ -10,13 +10,13 @@ import FluentPostgreSQL
 import Foundation
 import Vapor
 
-final class Location: Content {
+final class Location: Content, Parameter {
     var id: Int?
     
     var lat: String
     var lng: String
     var timestamp: String
-    var speed: String
+    var speed: String 
     var tripID: String?
     
     init(lat: String, lng: String, timestamp: String, speed: String, tripID: String) {

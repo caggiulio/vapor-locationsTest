@@ -21,7 +21,6 @@ final class LocationController: RouteCollection {
     }
     
     func create(_ request: Request, _ location: Location)throws -> Future<Location> {
-        location.timestamp = location.timestamp.stringToDate(timestamp: location.timestamp)
         return location.save(on: request)
     }
     
@@ -39,7 +38,7 @@ final class LocationController: RouteCollection {
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {
-        return location.map { Location(lat: $0.lat, lng: $0.lng, timestamp: $0.timestamp.stringToDate(timestamp: $0.timestamp), speed: $0.speed, tripID: ($0.tripID ?? "nil")).save(on: request) }
+        return location.map { Location(lat: $0.lat, lng: $0.lng, timestamp: $0.timestamp, speed: $0.speed, tripID: ($0.tripID ?? "nil")).save(on: request) }
             .flatten(on: request)
         /*return try request.content.decode([Location].self).map { locRequest in
             return .ok

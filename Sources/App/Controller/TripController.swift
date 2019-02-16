@@ -15,6 +15,7 @@ final class TripController: RouteCollection {
         
         trips.post(Trip.self, use: create)
         trips.get(use: index)
+        trips.get("deviceId", Trip.parameter, use: getList)
         trips.patch(TripContent.self, at: Trip.parameter, use: update)
     }
     
@@ -34,9 +35,46 @@ final class TripController: RouteCollection {
             return trip
         }).update(on: request)
     }
+    
+    /*func getList0(_ request: Request)throws -> Future<[TripCustomContent]> {
+        let deviceIdReq = request.parameters.values[0].value
+        var tripsR = [TripCustomContent]()
+        let val = Trip.query(on: request).filter(\.deviceId == deviceIdReq).all()
+        return val.flatMap { model in
+            var count = 0
+            for t in model {
+                
+                let tripIdString = String(t.id!)
+                
+                var c = Location.query(on: request).filter(\.tripID == tripIdString).count().map{ (result) -> (Int) in
+                    return result
+                }
+                
+                let tripCustomContent = TripCustomContent.init(startTimestamp: t.startTimestamp, endTimestamp: t.endTimestamp, deviceId: t.deviceId, locationCount: Location.query(on: request).filter(\.tripID == tripIdString).count())
+                tripsR.append(tripCustomContent)
+                //tripsR = model
+            }
+            return Future.map(on: request) {return tripsR }
+        }
+    }*/
+    
+    func getList(_ request: Request)throws -> Future<[Trip]> {
+        
+        let deviceIdReq = request.parameters.values[0].value
+        let queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).all()
+        return queryTrips
+    }
 }
 
 struct TripContent: Content {
     var startTimestamp: String?
     var endTimestamp: String?
+    var deviceId: String
+}
+
+struct TripCustomContent: Encodable {
+    var startTimestamp: String?
+    var endTimestamp: String?
+    var deviceId: String
+    var locationCount: Future<Int>
 }

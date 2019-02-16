@@ -15,7 +15,7 @@ final class LocationController: RouteCollection {
         locations.post(Location.self, use: create)
         locations.get(use: index)
         locations.post([Location].self, use: postArray)
-        locations.get(Location.parameter, use: show)
+        locations.get("trips", Location.parameter, use: show)
         //locations.patch(UserContent.self, at: User.parameter, use: update)
         //locations.delete(User.parameter, use: delete)
     }

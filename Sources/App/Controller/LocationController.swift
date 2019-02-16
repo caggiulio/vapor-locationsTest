@@ -25,7 +25,7 @@ final class LocationController: RouteCollection {
     }
     
     func index(_ request: Request)throws -> Future<[Location]> {
-        if let tripIDReq = try? request.query.get(String.self, at: "tripID") {
+        if let tripIDReq = try? request.query.get(Int.self, at: "tripID") {
             return Location.query(on: request).filter(\.tripID == tripIDReq).all()
         } else {
             return Location.query(on: request).all()
@@ -33,12 +33,12 @@ final class LocationController: RouteCollection {
     }
     
     func show(_ request: Request)throws -> Future<[Location]> {
-        let tripIDReq = request.parameters.values[0].value
+        let tripIDReq = Int(request.parameters.values[0].value)
         return Location.query(on: request).filter(\.tripID == tripIDReq).all()
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {
-        return location.map { Location(lat: $0.lat, lng: $0.lng, timestamp: $0.timestamp, speed: $0.speed, tripID: ($0.tripID ?? "nil")).save(on: request) }
+        return location.map { Location(lat: $0.lat, lng: $0.lng, timestamp: $0.timestamp, speed: $0.speed, tripID: ($0.tripID ?? -1), accuracy: ($0.accuracy ?? -1), verticalAccuracy: ($0.verticalAccuracy ?? -1), interpolationFlag: $0.interpolationFlag ?? false).save(on: request) }
             .flatten(on: request)
         /*return try request.content.decode([Location].self).map { locRequest in
             return .ok
@@ -49,7 +49,10 @@ final class LocationController: RouteCollection {
 struct LocationContent: Content {
     var lat: String?
     var lng: String?
-    var speed: String?
     var timestamp: String?
-    var tripID: String?
+    var speed: String?
+    var tripID: Int?
+    var accuracy: Float?
+    var verticalAccuracy: Float?
+    var interpolationFlag: Bool?
 }

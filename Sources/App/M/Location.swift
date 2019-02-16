@@ -17,14 +17,20 @@ final class Location: Content, Parameter {
     var lng: String
     var timestamp: String
     var speed: String 
-    var tripID: String?
+    var tripID: Int?
+    var accuracy: Float?
+    var verticalAccuracy: Float?
+    var interpolationFlag: Bool?
     
-    init(lat: String, lng: String, timestamp: String, speed: String, tripID: String) {
+    init(lat: String, lng: String, timestamp: String, speed: String, tripID: Int, accuracy: Float?, verticalAccuracy: Float?, interpolationFlag: Bool?) {
         self.lat = lat
         self.lng = lng
         self.timestamp = timestamp
         self.speed = speed
         self.tripID = tripID
+        self.verticalAccuracy = verticalAccuracy
+        self.accuracy = accuracy
+        self.interpolationFlag = interpolationFlag
     }
 }
 

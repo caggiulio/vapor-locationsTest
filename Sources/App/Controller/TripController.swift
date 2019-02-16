@@ -16,6 +16,7 @@ final class TripController: RouteCollection {
         trips.post(Trip.self, use: create)
         trips.get(use: index)
         trips.get("deviceId", Trip.parameter, use: getList)
+        trips.get("deviceId", use: getListWithoutDeviceId)
         trips.patch(TripContent.self, at: Trip.parameter, use: update)
     }
     
@@ -32,6 +33,7 @@ final class TripController: RouteCollection {
         return trip.map(to: Trip.self, { trip in
             trip.startTimestamp = body.startTimestamp ?? trip.startTimestamp
             trip.endTimestamp = body.endTimestamp ?? trip.endTimestamp
+            trip.deviceId = body.deviceId ?? trip.deviceId
             return trip
         }).update(on: request)
     }
@@ -64,12 +66,17 @@ final class TripController: RouteCollection {
         let queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).all()
         return queryTrips
     }
+    
+    func getListWithoutDeviceId(_ request: Request)throws -> Future<[Trip]> {
+        let queryTrips = Trip.query(on: request).all()
+        return queryTrips
+    }
 }
 
 struct TripContent: Content {
     var startTimestamp: String?
     var endTimestamp: String?
-    var deviceId: String
+    var deviceId: String?
 }
 
 struct TripCustomContent: Encodable {

@@ -34,7 +34,7 @@ final class LocationController: RouteCollection {
     
     func show(_ request: Request)throws -> Future<[Location]> {
         let tripIDReq = Int(request.parameters.values[0].value)
-        return Location.query(on: request).filter(\.tripID == tripIDReq).all()
+        return Location.query(on: request).filter(\.tripID == tripIDReq!).all()
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {
@@ -51,7 +51,7 @@ struct LocationContent: Content {
     var lng: String?
     var timestamp: String?
     var speed: String?
-    var tripID: Int?
+    var tripID: Int
     var accuracy: Float?
     var verticalAccuracy: Float?
     var interpolationFlag: Bool?

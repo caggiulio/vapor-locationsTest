@@ -17,7 +17,7 @@ final class Location: Content, Parameter {
     var lng: String
     var timestamp: String
     var speed: String 
-    var tripID: Int?
+    var tripID: Int
     var accuracy: Float?
     var verticalAccuracy: Float?
     var interpolationFlag: Bool?

@@ -26,15 +26,15 @@ final class LocationController: RouteCollection {
     
     func index(_ request: Request)throws -> Future<[Location]> {
         if let tripIDReq = try? request.query.get(Int.self, at: "tripID") {
-            return Location.query(on: request).filter(\.tripID == tripIDReq).all()
+            return Location.query(on: request).filter(\.tripID == tripIDReq).sort(\.timestamp).all()
         } else {
-            return Location.query(on: request).all()
+            return Location.query(on: request).sort(\.timestamp).all()
         }
     }
     
     func show(_ request: Request)throws -> Future<[Location]> {
         let tripIDReq = Int(request.parameters.values[0].value)
-        return Location.query(on: request).filter(\.tripID == tripIDReq!).all()
+        return Location.query(on: request).filter(\.tripID == tripIDReq!).sort(\.timestamp).all()
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {

@@ -94,9 +94,19 @@ final class TripController: RouteCollection {
         return queryTrips
     }*/
     
-    func getListWithoutDeviceId(_ request: Request)throws -> Future<[Trip]> {
+    func getListWithoutDeviceId(_ request: Request)throws -> Future<[TripCustomContent]> {
         let queryTrips = Trip.query(on: request).all()
-        return queryTrips
+        
+        return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
+            let tripIds = trips.map({ ($0.id!) })
+            
+            return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
+                return trips.map { trip in
+                    let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
+                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount)
+                }
+            }
+        }
     }
 }
 

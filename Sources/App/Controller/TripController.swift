@@ -15,8 +15,6 @@ final class TripController: RouteCollection {
         
         trips.post(Trip.self, use: create)
         trips.get(use: index)
-        trips.get("deviceId", Trip.parameter, use: getList)
-        trips.get("deviceId", use: getListWithoutDeviceId)
         trips.patch(TripContent.self, at: Trip.parameter, use: update)
     }
     
@@ -54,7 +52,7 @@ final class TripController: RouteCollection {
         }).update(on: request)
     }
     
-    func getList(_ request: Request) throws -> Future<[TripCustomContent]> {
+    /*func getList(_ request: Request) throws -> Future<[TripCustomContent]> {
         let deviceIdReq = request.parameters.values[0].value
         let queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp, ._descending).all()
         
@@ -68,51 +66,7 @@ final class TripController: RouteCollection {
                 }
             }
         }
-    }
-    
-    /*func getList0(_ request: Request)throws -> Future<[TripCustomContent]> {
-        let deviceIdReq = request.parameters.values[0].value
-        var tripsR = [TripCustomContent]()
-        let val = Trip.query(on: request).filter(\.deviceId == deviceIdReq).all()
-        return val.flatMap { model in
-            var count = 0
-            for t in model {
-                
-                let tripIdString = String(t.id!)
-                
-                var c = Location.query(on: request).filter(\.tripID == tripIdString).count().map{ (result) -> (Int) in
-                    return result
-                }
-                
-                let tripCustomContent = TripCustomContent.init(startTimestamp: t.startTimestamp, endTimestamp: t.endTimestamp, deviceId: t.deviceId, locationCount: Location.query(on: request).filter(\.tripID == tripIdString).count())
-                tripsR.append(tripCustomContent)
-                //tripsR = model
-            }
-            return Future.map(on: request) {return tripsR }
-        }
     }*/
-    
-    /*func getList(_ request: Request)throws -> Future<[Trip]> {
-        
-        let deviceIdReq = request.parameters.values[0].value
-        let queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).all()
-        return queryTrips
-    }*/
-    
-    func getListWithoutDeviceId(_ request: Request)throws -> Future<[TripCustomContent]> {
-        let queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
-        
-        return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
-            let tripIds = trips.map({ ($0.id!) })
-            
-            return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
-                return trips.map { trip in
-                    let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
-                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
-                }
-            }
-        }
-    }
 }
 
 struct TripContent: Content {

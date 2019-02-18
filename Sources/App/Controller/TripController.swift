@@ -33,7 +33,7 @@ final class TripController: RouteCollection {
             return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
                 return trips.map { trip in
                     let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
-                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount)
+                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
                 }
             }
         }
@@ -59,7 +59,7 @@ final class TripController: RouteCollection {
             return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
                 return trips.map { trip in
                     let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
-                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount)
+                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
                 }
             }
         }
@@ -103,7 +103,7 @@ final class TripController: RouteCollection {
             return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
                 return trips.map { trip in
                     let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
-                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount)
+                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
                 }
             }
         }
@@ -121,4 +121,5 @@ struct TripCustomContent: Content {
     var endTimestamp: String?
     var deviceId: String
     var locationCount: Int
+    var tripId: Int
 }

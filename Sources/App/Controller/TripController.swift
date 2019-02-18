@@ -25,7 +25,7 @@ final class TripController: RouteCollection {
     }
     
     func index(_ request: Request)throws -> Future<[TripCustomContent]> {
-        let queryTrips = Trip.query(on: request).sort(\.startTimestamp).all()
+        let queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
         
         return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
             let tripIds = trips.map({ ($0.id!) })
@@ -51,7 +51,7 @@ final class TripController: RouteCollection {
     
     func getList(_ request: Request) throws -> Future<[TripCustomContent]> {
         let deviceIdReq = request.parameters.values[0].value
-        let queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp).all()
+        let queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp, ._descending).all()
         
         return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
             let tripIds = trips.map({ ($0.id!) })
@@ -95,7 +95,7 @@ final class TripController: RouteCollection {
     }*/
     
     func getListWithoutDeviceId(_ request: Request)throws -> Future<[TripCustomContent]> {
-        let queryTrips = Trip.query(on: request).sort(\.startTimestamp).all()
+        let queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
         
         return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
             let tripIds = trips.map({ ($0.id!) })

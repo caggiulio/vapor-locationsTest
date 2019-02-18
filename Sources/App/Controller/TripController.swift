@@ -25,7 +25,12 @@ final class TripController: RouteCollection {
     }
     
     func index(_ request: Request)throws -> Future<[TripCustomContent]> {
-        let queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
+        
+        var queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
+        
+        if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
+            queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp, ._descending).all()
+        }
         
         return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
             let tripIds = trips.map({ ($0.id!) })

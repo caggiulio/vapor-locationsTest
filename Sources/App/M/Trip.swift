@@ -9,6 +9,7 @@ import Foundation
 import FluentPostgreSQL
 import Foundation
 import Vapor
+import Pagination
 
 final class Trip: Content, Parameter {
     var id: Int?
@@ -26,3 +27,14 @@ final class Trip: Content, Parameter {
 
 extension Trip: PostgreSQLModel {}
 extension Trip: Migration{}
+extension Trip: Paginatable {
+    public static var defaultPageSize: Int {
+        return 5
+    }
+    
+    public static var defaultPageSorts: [Trip.Database.QuerySort] {
+        return [
+            Trip.createdAtKey?.querySort(Trip.Database.querySortDirectionDescending) ?? Trip.idKey.querySort(Trip.Database.querySortDirectionDescending)
+        ]
+    }
+}

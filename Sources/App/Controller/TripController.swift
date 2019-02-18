@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
+import Pagination
 
 final class TripController: RouteCollection {
     func boot(router: Router) throws {
@@ -26,17 +27,18 @@ final class TripController: RouteCollection {
     
     func index(_ request: Request)throws -> Future<[TripCustomContent]> {
         
-        var queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
+        var queryTrips = try Trip.query(on: request).paginate(for: request, [(\Trip.startTimestamp).querySort()])
         
         if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
-            queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp, ._descending).all()
+            queryTrips = try Trip.query(on: request).filter(\.deviceId == deviceIdReq).paginate(for: request, [(\Trip.startTimestamp).querySort()])
         }
         
         return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
-            let tripIds = trips.map({ ($0.id!) })
+            let tripIds = trips.data.map({ ($0.id!) })
+            //let tripIds = trips.map({ ($0.id!) })
             
             return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
-                return trips.map { trip in
+                return trips.data.map { trip in
                     let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
                     return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
                 }

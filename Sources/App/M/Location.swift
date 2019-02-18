@@ -35,4 +35,12 @@ final class Location: Content, Parameter {
 }
 
 extension Location: PostgreSQLModel {}
-extension Location: Migration {}
+extension Location: Migration {
+    static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
+        return Database.create(self, on: connection) { builder in
+            try addProperties(to: builder)
+            }.flatMap { _ -> EventLoopFuture<Void> in
+                return connection.query("CREATE INDEX idx_trip ON \"Location\" (\"tripID\")").transform(to: ())
+        }
+    }
+}

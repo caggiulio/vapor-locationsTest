@@ -40,7 +40,7 @@ extension Location: Migration {
         return Database.create(self, on: connection) { builder in
             try addProperties(to: builder)
             }.flatMap { _ -> EventLoopFuture<Void> in
-                return connection.query("CREATE INDEX idx_trip ON \"Location\" (\"tripID\")").transform(to: ())
+              return  connection.create(index: GenericSQLIdentifier.init(stringLiteral: "tripID")).run()
         }
     }
 }

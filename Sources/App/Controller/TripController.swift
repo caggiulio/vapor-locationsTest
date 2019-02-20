@@ -24,11 +24,31 @@ final class TripController: RouteCollection {
     }
     
     func index(_ request: Request)throws -> Future<[TripCustomContent]> {
-        
+        var rawQueryString = ""
+        var whereClause = ""
+        if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
+            whereClause = """
+            WHERE
+            "Trip"."deviceId" ilike '\(deviceIdReq)'
+            """
+        }
+            rawQueryString = """
+            SELECT
+            "Trip".id AS "tripId",
+            "startTimestamp",
+            "endTimestamp",
+            "deviceId",
+            count("tripID") AS "locationCount"
+            FROM
+            "Trip"
+            LEFT JOIN "Location" AS P ON "Trip".id = "tripID"
+            \(whereClause)
+            GROUP BY
+            "Trip".id
+            """
+    
         let customTrips = request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[TripCustomContent]> in
-            return conn.raw("""
-select "Trip".id as "tripId", "startTimestamp","endTimestamp","deviceId", count("tripID") as "locationCount" from "Trip"  left join "Location" as P on "Trip".id = "tripID" GROUP BY "Trip".id
-""").all(decoding: TripCustomContent.self)
+            return conn.raw(rawQueryString).all(decoding: TripCustomContent.self)
         }
         return customTrips
         

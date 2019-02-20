@@ -7,6 +7,7 @@
 
 import Vapor
 import Fluent
+import FluentPostgreSQL
 
 final class LocationController: RouteCollection {
     func boot(router: Router) throws {
@@ -26,9 +27,19 @@ final class LocationController: RouteCollection {
     
     func index(_ request: Request)throws -> Future<[Location]> {
         if let tripIDReq = try? request.query.get(Int.self, at: "tripID") {
-            return Location.query(on: request).filter(\.tripID == tripIDReq).sort(\.timestamp).all()
+            //return Location.query(on: request).filter(\.tripID == tripIDReq).sort(\.timestamp).all()
+            return request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[Location]> in
+                return conn.raw("""
+select  * from "Location" where "tripID" = \(tripIDReq)
+""").all(decoding: Location.self)
+            }
         } else {
-            return Location.query(on: request).sort(\.timestamp).all()
+            return request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[Location]> in
+                return conn.raw("""
+                    select  * from "Location"
+                    """).all(decoding: Location.self)
+            //return Location.query(on: request).sort(\.timestamp).all()
+            }
         }
     }
     
@@ -38,7 +49,7 @@ final class LocationController: RouteCollection {
     }
     
     func postArray(_ request: Request, _ location: [Location])throws -> Future<[Location]> {
-        return location.map { Location(lat: $0.lat, lng: $0.lng, timestamp: $0.timestamp, speed: $0.speed, tripID: ($0.tripID ?? -1), accuracy: ($0.accuracy ?? -1), verticalAccuracy: ($0.verticalAccuracy ?? -1), interpolationFlag: $0.interpolationFlag ?? false).save(on: request) }
+        return location.map { Location(lat: $0.lat, lng: $0.lng, timestamp: $0.timestamp, speed: $0.speed, tripID: ($0.tripID), accuracy: ($0.accuracy ?? -1), verticalAccuracy: ($0.verticalAccuracy ?? -1), interpolationFlag: $0.interpolationFlag ?? false).save(on: request) }
             .flatten(on: request)
         /*return try request.content.decode([Location].self).map { locRequest in
             return .ok

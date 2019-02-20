@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import Fluent
+import FluentPostgreSQL
 
 final class TripController: RouteCollection {
     func boot(router: Router) throws {
@@ -24,7 +25,14 @@ final class TripController: RouteCollection {
     
     func index(_ request: Request)throws -> Future<[TripCustomContent]> {
         
-        var queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
+        let customTrips = request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[TripCustomContent]> in
+            return conn.raw("""
+select "Trip".id as "tripId", "startTimestamp","endTimestamp","deviceId", count("tripID") as "locationCount" from "Trip"  left join "Location" as P on "Trip".id = "tripID" GROUP BY "Trip".id
+""").all(decoding: TripCustomContent.self)
+        }
+        return customTrips
+        
+        /*var queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
         
         if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
             queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp, ._descending).all()
@@ -39,7 +47,7 @@ final class TripController: RouteCollection {
                     return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
                 }
             }
-        }
+        }*/
     }
     
     func update(_ request: Request, _ body: TripContent)throws -> Future<Trip> {

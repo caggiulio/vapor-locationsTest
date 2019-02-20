@@ -30,16 +30,17 @@ final class LocationController: RouteCollection {
             //return Location.query(on: request).filter(\.tripID == tripIDReq).sort(\.timestamp).all()
             return request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[Location]> in
                 return conn.raw("""
-select  * from "Location" where "tripID" = \(tripIDReq)
-""").all(decoding: Location.self)
+                    SELECT
+                        *
+                    FROM
+                        "Location"
+                    WHERE
+                        "tripID" = \(tripIDReq)
+                    """).all(decoding: Location.self)
             }
         } else {
-            return request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[Location]> in
-                return conn.raw("""
-                    select  * from "Location"
-                    """).all(decoding: Location.self)
-            //return Location.query(on: request).sort(\.timestamp).all()
-            }
+            let x = [Location]()
+            return request.eventLoop.future(x)
         }
     }
     

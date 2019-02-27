@@ -34,6 +34,7 @@ public func configure(
     var migrations = MigrationConfig()
     migrations.add(model: Location.self, database: .psql)
     migrations.add(model: Trip.self, database: .psql)
+    migrations.add(migration: AddTripDeviceModel.self, database: .psql)
     //migrations.add(migration: AddTripDeviceId.self, database: .psql)
     //migrations.add(migration: AddAccuracyAndInterpolationToLocation.self, database: .psql)
     services.register(migrations)

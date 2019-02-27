@@ -37,6 +37,7 @@ final class TripController: RouteCollection {
             "Trip".id AS "tripId",
             "startTimestamp",
             "endTimestamp",
+            "deviceModel",
             "deviceId",
             count("tripID") AS "locationCount"
             FROM
@@ -76,6 +77,7 @@ final class TripController: RouteCollection {
             trip.startTimestamp = body.startTimestamp ?? trip.startTimestamp
             trip.endTimestamp = body.endTimestamp ?? trip.endTimestamp
             trip.deviceId = body.deviceId ?? trip.deviceId
+            trip.deviceModel = body.deviceModel ?? trip.deviceModel
             return trip
         }).update(on: request)
     }
@@ -101,6 +103,7 @@ struct TripContent: Content {
     var startTimestamp: String?
     var endTimestamp: String?
     var deviceId: String?
+    var deviceModel: String?
 }
 
 struct TripCustomContent: Content {
@@ -109,4 +112,5 @@ struct TripCustomContent: Content {
     var deviceId: String
     var locationCount: Int
     var tripId: Int
+    var deviceModel: String?
 }

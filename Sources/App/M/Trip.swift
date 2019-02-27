@@ -16,11 +16,13 @@ final class Trip: Content, Parameter {
     var startTimestamp: String
     var endTimestamp: String?
     var deviceId: String
+    var deviceModel: String?
     
-    init(startTimestamp: String, endTimestamp: String, deviceId: String) {
+    init(startTimestamp: String, endTimestamp: String, deviceId: String, deviceModel: String) {
         self.startTimestamp = startTimestamp
         self.endTimestamp = endTimestamp
         self.deviceId = deviceId
+        self.deviceModel = deviceModel
     }
 }
 

@@ -20,6 +20,10 @@ final class TripController: RouteCollection {
     }
     
     func create(_ request: Request, _ trip: Trip)throws -> Future<Trip> {
+        if trip.deviceModel == nil {
+            trip.deviceModel = ""
+        }
+
         return trip.save(on: request)
     }
     

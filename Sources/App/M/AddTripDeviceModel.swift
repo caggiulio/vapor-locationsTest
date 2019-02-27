@@ -11,7 +11,7 @@ import FluentPostgreSQL
 struct AddTripDeviceModel: PostgreSQLMigration {
     static func prepare(on conn: PostgreSQLConnection) -> EventLoopFuture<Void> {
         return PostgreSQLDatabase.update(Trip.self, on: conn) { builder in
-            let defaultValueConstraint = PostgreSQLColumnConstraint.default(.literal(0))
+            let defaultValueConstraint = PostgreSQLColumnConstraint.default(.literal(""))
             builder.field(for: \.deviceModel, type: .text, defaultValueConstraint)
         }
     }

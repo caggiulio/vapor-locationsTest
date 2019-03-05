@@ -23,7 +23,7 @@ public func configure(
     
     var databases = DatabasesConfig()
     //let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "giulio-skylabs", database: "locationstest")
-    let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "giulio", database: "locationstest", password: "cgg41355756nzg")
+    let config = PostgreSQLDatabaseConfig(hostname: "localhost", username: "root", database: "locationstest", password: "cgg41355756nzg")
     databases.add(database: PostgreSQLDatabase(config: config), as: .psql)
     services.register(databases)
     
@@ -34,7 +34,7 @@ public func configure(
     var migrations = MigrationConfig()
     migrations.add(model: Location.self, database: .psql)
     migrations.add(model: Trip.self, database: .psql)
-    migrations.add(migration: AddTripDeviceModel.self, database: .psql)
+    //migrations.add(migration: AddTripDeviceModel.self, database: .psql)
     //migrations.add(migration: AddTripDeviceId.self, database: .psql)
     //migrations.add(migration: AddAccuracyAndInterpolationToLocation.self, database: .psql)
     services.register(migrations)

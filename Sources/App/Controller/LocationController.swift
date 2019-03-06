@@ -27,8 +27,8 @@ final class LocationController: RouteCollection {
     
     func index(_ request: Request)throws -> Future<[Location]> {
         if let tripIDReq = try? request.query.get(Int.self, at: "tripID") {
-            //return Location.query(on: request).filter(\.tripID == tripIDReq).sort(\.timestamp).all()
-            return request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[Location]> in
+            return Location.query(on: request).filter(\.tripID == tripIDReq).sort(\.timestamp).all()
+            /*return request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[Location]> in
                 return conn.raw("""
                     SELECT
                         *
@@ -37,7 +37,7 @@ final class LocationController: RouteCollection {
                     WHERE
                         "tripID" = \(tripIDReq)
                     """).all(decoding: Location.self)
-            }
+            }*/
         } else {
             let x = [Location]()
             return request.eventLoop.future(x)

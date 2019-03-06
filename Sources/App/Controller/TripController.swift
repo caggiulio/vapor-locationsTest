@@ -28,7 +28,7 @@ final class TripController: RouteCollection {
     }
     
     func index(_ request: Request)throws -> Future<[TripCustomContent]> {
-        var rawQueryString = ""
+        /*var rawQueryString = ""
         var whereClause = ""
         if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
             whereClause = """
@@ -55,24 +55,29 @@ final class TripController: RouteCollection {
         let customTrips = request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[TripCustomContent]> in
             return conn.raw(rawQueryString).all(decoding: TripCustomContent.self)
         }
-        return customTrips
+        return customTrips*/
         
-        /*var queryTrips = Trip.query(on: request).sort(\.startTimestamp, ._descending).all()
-        
-        if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
-            queryTrips = Trip.query(on: request).filter(\.deviceId == deviceIdReq).sort(\.startTimestamp, ._descending).all()
-        }
-        
-        return queryTrips.flatMap { trips -> Future<[TripCustomContent]> in
-            let tripIds = trips.map({ ($0.id!) })
+        let customTrips = request.withPooledConnection(to: .psql) { (conn: PostgreSQLDatabase.Connection) -> EventLoopFuture<[TripCustomContent]> in
+            var res = conn.select()
+                .column(.column(\Trip.id), as: "tripId")
+                .column(\Trip.startTimestamp)
+                .column(\Trip.endTimestamp)
+                .column(\Trip.deviceModel)
+                .column(\Trip.deviceId)
+                .column(.count(\Location.tripID), as: "locationCount")
+                .from(Trip.self)
+                .join(\Trip.id, to: \Location.tripID)
             
-            return Location.query(on: request).filter(\.tripID ~~ tripIds).all().map { locations in
-                return trips.map { trip in
-                    let locationCount = locations.filter({ $0.tripID == (trip.id!) }).count
-                    return TripCustomContent.init(startTimestamp: trip.startTimestamp, endTimestamp: trip.endTimestamp, deviceId: trip.deviceId, locationCount: locationCount, tripId: trip.id!)
-                }
+            if let deviceIdReq = try? request.query.get(String.self, at: "deviceId") {
+                res = res.where(\Trip.deviceId, .equal, deviceIdReq)
             }
-        }*/
+            
+            res = res.groupBy(.column(.keyPath(\Trip.id)))
+            
+            return res.all(decoding: TripCustomContent.self)
+        }
+
+        return customTrips
     }
     
     func update(_ request: Request, _ body: TripContent)throws -> Future<Trip> {
